@@ -1,4 +1,4 @@
-import { API_URL } from "@/constants/api";
+import { API_URL } from "@/constants";
 import { getHeaders } from "@/lib/fetch";
 
 export default async function getCategories(type: string) {

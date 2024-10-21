@@ -24,7 +24,7 @@ export interface IDataCategory extends ICategory {
 export interface ITransaction {
   uuid: string;
   category: ICategory;
-  type: string;
+  type: "income" | "expense";
   amount: number;
   description: string;
   date: string;

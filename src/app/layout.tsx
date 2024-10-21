@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Authenticated from "./(auth)/authenticated";
 import Providers from "./providers";
 import Navbar from "@/components/partials/navbar";
+import { getProfile } from "@/actions/user";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,29 +20,30 @@ export const metadata: Metadata = {
     "A simple expense tracker to help you keep track of your spending",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const isAuthenticated = Authenticated();
+  const profile = await getProfile();
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={poppins.className}>
-        <Providers authenticated={isAuthenticated}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange>
+          <Providers authenticated={isAuthenticated} profile={profile}>
             {isAuthenticated && <Navbar />}
             <main className={isAuthenticated ? "logged-in" : ""}>
               {children}
             </main>
             <Toaster />
-          </ThemeProvider>
-        </Providers>
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

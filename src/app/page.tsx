@@ -1,51 +1,51 @@
-import getCategories from "@/actions/getCategories";
-import getTransactions from "@/actions/getTransactions";
-import TransactionChart from "@/components/partials/transaction/chart";
+import { getTransactions } from "@/actions/transaction";
 import Create from "@/components/partials/transaction/create";
 import TransactionCards from "@/components/partials/transaction/transaction-cards";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import Wrapper from "@/components/wrapper";
 import { formatCurrency } from "@/lib/utils";
+import styles from "./home.module.css";
+import Chart from "@/components/partials/transaction/chart";
 
 export default async function Home() {
-  const transactions = await getTransactions();
-  const categoriesIncome = await getCategories("income");
-  const categoriesExpense = await getCategories("expense");
+  const dataTransaction = await getTransactions();
 
   return (
     <div className="container mx-auto border-l border-r">
-      <div className="flex">
+      <div className="flex flex-col sm:flex-row">
         <div className="w-full">
           <Wrapper className="flex justify-between items-center">
             <div>
               <div className="text-lg font-light">My Pocket</div>
               <div className="text-2xl font-medium">
-                {formatCurrency(transactions.my_pocket, "IDR", "id-ID")}
+                {formatCurrency(dataTransaction.my_pocket, "IDR", "id-ID")}
               </div>
             </div>
             <Create />
           </Wrapper>
-          <TransactionCards transactions={transactions.transactions} />
+          <ScrollArea className={styles.scrollArea}>
+            <TransactionCards transactions={dataTransaction.transactions} />
+            <Separator orientation="horizontal" className="flex sm:hidden" />
+            <Wrapper className="p-4 block sm:hidden">
+              <Chart
+                className="border rounded-lg"
+                totalIncome={dataTransaction.total_income}
+                totalExpense={dataTransaction.total_expense}
+              />
+            </Wrapper>
+          </ScrollArea>
         </div>
         <Separator
           orientation="vertical"
+          className="hidden sm:flex"
           style={{ minHeight: "calc(100vh - 4.6rem)" }}
         />
-        <div
-          className="w-full max-w-xl"
-          style={{ minHeight: "calc(100vh - 4.6rem)" }}>
-          <TransactionChart
-            categories={categoriesIncome}
-            type="Income"
-            amount={transactions.total_income}
-          />
-          <Separator className="w-full" orientation="horizontal" />
-          <TransactionChart
-            categories={categoriesExpense}
-            type="Expense"
-            amount={transactions.total_expense}
-          />
-        </div>
+        <Chart
+          className="hidden sm:block"
+          totalIncome={dataTransaction.total_income}
+          totalExpense={dataTransaction.total_expense}
+        />
       </div>
     </div>
   );

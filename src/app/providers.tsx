@@ -1,15 +1,21 @@
 "use client";
-import { ReactElement } from "react";
+import { ReactNode } from "react";
 import { AuthContext } from "./(auth)/auth-context";
+import { IProfile } from "@/types/user";
 
 interface ProvidersProps {
-  children: ReactElement;
+  children: ReactNode;
   authenticated: boolean;
+  profile: IProfile;
 }
 
-export default function Providers({ children, authenticated }: ProvidersProps) {
+export default function Providers({
+  children,
+  authenticated,
+  profile,
+}: ProvidersProps) {
   return (
-    <AuthContext.Provider value={authenticated}>
+    <AuthContext.Provider value={{ authenticated, profile }}>
       {children}
     </AuthContext.Provider>
   );

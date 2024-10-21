@@ -1,7 +1,4 @@
-"use client";
-import { createTransaction } from "@/actions/transaction";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +6,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MdOutlineEdit } from "react-icons/md";
+import { ICategory } from "@/types";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formSchema } from "@/constants/validation";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -21,52 +22,56 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { formSchema } from "@/constants/validation";
-import { useToast } from "@/hooks/use-toast";
-import { cleanedAmount, cn, formatNumber } from "@/lib/utils";
-import { faker } from "@faker-js/faker";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CalendarIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { IoIosAdd } from "react-icons/io";
+import { format } from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
 import { IoReload } from "react-icons/io5";
-import { z } from "zod";
-import SelectedType from "./selected-type";
+import { Textarea } from "@/components/ui/textarea";
+import { cleanedAmount, cn, formatNumber } from "@/lib/utils";
+import { updateTransaction } from "@/actions/transaction";
 
-const Create = () => {
+interface EditProps {
+  uuid: string;
+  category: ICategory;
+  type: "income" | "expense";
+  amount: number;
+  description: string;
+  date: string;
+}
+
+const Edit = ({ ...props }: EditProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [type, setType] = useState<"income" | "expense">("income");
   const [open, setOpen] = useState(false);
-
   const router = useRouter();
-
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: new Date(),
-      amount: "0",
-      category_name: "",
-      description: "",
+      date: new Date(props.date),
+      amount: formatNumber(props.amount.toString()),
+      category_name: props.category.name,
+      description: props.description,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    const result = await createTransaction({
-      type: type,
+    const payload = {
       amount: cleanedAmount(values.amount),
       category_name: values.category_name,
       description: values.description,
       date: values.date,
-    });
+    };
+
+    const result = await updateTransaction(payload, props.uuid);
 
     if (result.success) {
       toast({
@@ -85,59 +90,16 @@ const Create = () => {
         variant: "destructive",
       });
     }
-
-    form.reset();
   }
-
-  const autoFill = () => {
-    const date = new Date(faker.date.recent({ days: 30 }));
-    const amount = faker.number.int({
-      min: 5000,
-      max: 5000000,
-      multipleOf: 5000,
-    });
-
-    const categoriesIncome = [
-      "Salary",
-      "Freelance Work",
-      "Investment Returns",
-      "Rental Income",
-      "Business Revenue",
-    ];
-
-    const categoriesExpense = [
-      "Food",
-      "Rent",
-      "Entertainment",
-      "Transportation",
-      "Subscriptions",
-      "Groceries",
-    ];
-
-    let category_name = faker.helpers.arrayElement(categoriesIncome);
-
-    switch (type) {
-      case "income":
-        category_name = faker.helpers.arrayElement(categoriesIncome);
-        break;
-      case "expense":
-        category_name = faker.helpers.arrayElement(categoriesExpense);
-        break;
-      default:
-        break;
-    }
-
-    form.setValue("date", date);
-    form.setValue("amount", formatNumber(amount.toString()));
-    form.setValue("category_name", category_name);
-    form.setValue("description", faker.lorem.sentences({ min: 1, max: 2 }));
-  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="icon" className="h-11 w-11">
-          <IoIosAdd className="text-3xl" />
+        <Button
+          className="px-2 h-6 rounded-sm rounded-r-none hover:text-amber-500"
+          size="sm"
+          variant="secondary">
+          <MdOutlineEdit />
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -145,11 +107,10 @@ const Create = () => {
         className="p-0 gap-0 max-w-xl">
         <DialogHeader className="border-b px-8 h-16 flex justify-center">
           <DialogTitle className="font-light text-lg tracking-normal">
-            New {type === "income" ? "Income" : "Expense"}
+            Edit Transaction
           </DialogTitle>
         </DialogHeader>
         <div className="p-8">
-          <SelectedType type={type} setType={setType} />
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
@@ -212,7 +173,7 @@ const Create = () => {
                           <Input
                             type="text"
                             placeholder={`Fill in the amount of ${
-                              type === "income" ? "income" : "expenditure"
+                              props.type === "income" ? "income" : "expenditure"
                             }`}
                             {...field}
                             value={field.value}
@@ -280,10 +241,10 @@ const Create = () => {
                       <IoReload className="mr-2 h-4 w-4 animate-spin" />
                       Please wait
                     </div>
-                  ) : type === "income" ? (
-                    "Add Income"
+                  ) : props.type === "income" ? (
+                    "Edit Income"
                   ) : (
-                    "Add Expense"
+                    "Edit Expense"
                   )}
                 </Button>
                 <Button
@@ -291,7 +252,6 @@ const Create = () => {
                   variant="secondary"
                   onClick={() => {
                     form.reset();
-                    setType("income");
                   }}
                   className="w-fit rounded-sm"
                   size="lg">
@@ -300,20 +260,10 @@ const Create = () => {
               </div>
             </form>
           </Form>
-          <div className="mt-4 absolute -translate-x-1/2 -translate-y-1/2 top-4 left-1/2">
-            <Button
-              variant="destructive"
-              type="button"
-              size="lg"
-              onClick={autoFill}
-              className="w-full text-sm">
-              Auto Fill
-            </Button>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default Create;
+export default Edit;

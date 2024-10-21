@@ -16,6 +16,18 @@ export function formatCurrency(
   }).format(amount);
 }
 
+export function formatNumber(value: string) {
+  // Remove any non-numeric characters
+  const numericValue = value.replace(/\D/g, "");
+
+  // Format the number with dots after every 3 digits
+  return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+export function cleanedAmount(amount: string) {
+  return parseFloat(amount.replace(/\./g, ""));
+}
+
 export function formatDate(isoDate: string) {
   const date = new Date(isoDate);
 

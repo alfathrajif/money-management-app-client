@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unauthenticatedRoutes } from "./constants/routes";
+import { unauthenticatedRoutes } from "./constants";
 import Authenticated from "./app/(auth)/authenticated";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
   const isAuthenticated = Authenticated();
   const isUnauthenticatedRoute = unauthenticatedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route.path)
+    pathname.startsWith(route.path)
   );
 
   if (!isAuthenticated && !isUnauthenticatedRoute) {
-    if (request.nextUrl.pathname !== "/login") {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (isAuthenticated && isUnauthenticatedRoute) {
-    if (request.nextUrl.pathname !== "/") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (isAuthenticated && isUnauthenticatedRoute && pathname !== "/") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

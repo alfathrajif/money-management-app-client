@@ -1,6 +1,6 @@
 import getAuthToken from "@/actions/getAuthToken";
 import { AUTHENTICATION_COOKIE } from "@/app/(auth)/auth-cookie";
-import { API_URL } from "@/constants/api";
+import { API_URL } from "@/constants";
 import axios from "axios";
 
 const headers = {
@@ -34,12 +34,5 @@ instance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-// instance.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   (error) => Promise.reject(error)
-// );
 
 export default instance;

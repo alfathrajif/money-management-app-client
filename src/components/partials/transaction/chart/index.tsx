@@ -1,5 +1,5 @@
 import Wrapper from "@/components/wrapper";
-import { formatCurrency, getRandomAmberHSL } from "@/lib/utils";
+import { cn, formatCurrency, getRandomAmberHSL } from "@/lib/utils";
 import React from "react";
 import ChartPie from "./chart-pie";
 import ChartList from "./chart-list";
@@ -12,6 +12,7 @@ import {
   IChartDataCategory,
   IDataCategory,
 } from "@/types";
+import getCategories from "@/actions/getCategories";
 
 interface TransactionChartProps {
   categories: IDataCategory[];
@@ -58,15 +59,15 @@ const TransactionChart = ({ ...props }: TransactionChartProps) => {
   return (
     <div className="h-1/2">
       <Wrapper className="flex justify-between items-center border-b h-[55px]">
-        <div className="text-2xl font-light">{props.type}</div>
-        <div className="text-2xl font-medium">
+        <div className="text-xl xl:text-2xl font-light">{props.type}</div>
+        <div className="text-xl xl:text-2xl font-medium">
           {formatCurrency(props.amount, "IDR", "id-ID")}
         </div>
       </Wrapper>
-      <div className="flex">
+      <div className="flex flex-col xl:flex-row">
         <ChartPie data={chartData} config={chartConfig} />
         <ScrollArea className={styles.lists}>
-          <Wrapper className="pl-0 py-0">
+          <Wrapper className="xl:pl-0 py-2 px-4 xl:px-6">
             {categoryTransactions.map((item, index) => {
               return (
                 <React.Fragment key={item.name}>
@@ -89,4 +90,32 @@ const TransactionChart = ({ ...props }: TransactionChartProps) => {
   );
 };
 
-export default TransactionChart;
+interface ChartProps {
+  totalIncome: number;
+  totalExpense: number;
+  className?: string;
+}
+
+const Chart = async ({ totalIncome, totalExpense, className }: ChartProps) => {
+  const categoriesIncome = await getCategories("income");
+  const categoriesExpense = await getCategories("expense");
+  return (
+    <div
+      className={cn("w-full sm:max-w-xs xl:max-w-lg 2xl:max-w-xl", className)}
+      style={{ minHeight: "calc(100vh - 4.6rem)" }}>
+      <TransactionChart
+        categories={categoriesIncome}
+        type="Income"
+        amount={totalIncome}
+      />
+      <Separator className="w-full" orientation="horizontal" />
+      <TransactionChart
+        categories={categoriesExpense}
+        type="Expense"
+        amount={totalExpense}
+      />
+    </div>
+  );
+};
+
+export default Chart;

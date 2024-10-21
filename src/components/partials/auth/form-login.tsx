@@ -1,5 +1,5 @@
 "use client";
-
+import { login } from "@/actions/login";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,8 +10,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import authServices from "@/services/auth";
-import { IAuthRegister } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,7 +28,6 @@ const FormLogin = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<IAuthRegister | null>(null);
 
   const { toast } = useToast();
 
@@ -45,37 +42,26 @@ const FormLogin = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
-    const payload = {
+    const result = await login({
       email: values.email,
       password: values.password,
-    };
+    });
 
-    try {
-      const response = await authServices.login(payload);
-      const result = response.data;
-
-      if (result.success) {
-        toast({
-          description: result.message,
-          variant: "default",
-        });
-
-        setIsLoading(false);
-
-        router.refresh();
-      } else {
-        setErrors(result.errors);
-        toast({
-          title: result.message,
-          description: result.errors.email,
-          variant: "destructive",
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsLoading(false);
+    if (result.success) {
+      toast({
+        description: result.message,
+        variant: "default",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: result.message,
+        description: result.errors,
+        variant: "destructive",
+      });
     }
+
+    setIsLoading(false);
   }
 
   const autoFillLogin = () => {
@@ -105,11 +91,6 @@ const FormLogin = () => {
                     }
                   />
                 </FormControl>
-                {errors?.email && (
-                  <p className="text-xs pl-4 font-medium text-destructive">
-                    {errors.email}
-                  </p>
-                )}
                 <FormMessage className="pl-4 text-xs" />
               </FormItem>
             )}

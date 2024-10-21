@@ -12,7 +12,7 @@ const authServices = {
     instance
       .post("/auth/login", data)
       .then((response) => response)
-      .catch((err) => err.response.data),
+      .catch((err) => err.response),
 };
 
 export default authServices;
