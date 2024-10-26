@@ -3,21 +3,7 @@ import { API_URL } from "@/constants";
 import { getHeaders } from "@/lib/fetch";
 import transactionServices from "@/services/transaction";
 import { IDataTransaction } from "@/types";
-
-interface CreateTransaction {
-  type: "income" | "expense";
-  amount: number;
-  description: string;
-  date: Date;
-  category_name: string;
-}
-
-interface UpdateTransaction {
-  amount: number;
-  description: string;
-  date: Date;
-  category_name: string;
-}
+import { CreateTransaction, UpdateTransaction } from "@/types/transaction";
 
 export async function createTransaction(payload: CreateTransaction) {
   try {
@@ -49,6 +35,7 @@ export async function updateTransaction(
         description: payload.description,
         date: payload.date,
         category_name: payload.category_name,
+        payment_method_name: payload.payment_method_name,
       },
       uuid
     );

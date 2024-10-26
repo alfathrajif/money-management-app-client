@@ -1,3 +1,6 @@
+import { ISumPaymentMethod } from "./payment-methods";
+import { Transaction } from "./transaction";
+
 export interface IAuthRegister {
   name: string;
   email: string;
@@ -16,25 +19,17 @@ export interface ICategory {
 }
 
 export interface IDataCategory extends ICategory {
-  transactions: ITransaction[];
+  transactions: Transaction[];
   total_amount: number;
   percentage?: number;
 }
 
-export interface ITransaction {
-  uuid: string;
-  category: ICategory;
-  type: "income" | "expense";
-  amount: number;
-  description: string;
-  date: string;
-}
-
 export interface IDataTransaction {
-  transactions: ITransaction[];
+  transactions: Transaction[];
   total_income: number;
   total_expense: number;
   my_pocket: number;
+  sum_payment_methods: ISumPaymentMethod[];
 }
 
 export interface IChartDataCategory extends IDataCategory {

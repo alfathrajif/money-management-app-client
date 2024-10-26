@@ -35,11 +35,13 @@ import { IoReload } from "react-icons/io5";
 import { Textarea } from "@/components/ui/textarea";
 import { cleanedAmount, cn, formatNumber } from "@/lib/utils";
 import { updateTransaction } from "@/actions/transaction";
+import { PaymentMethod } from "@/types/payment-methods";
 
 interface EditProps {
   uuid: string;
   category: ICategory;
-  type: "income" | "expense";
+  payment_method: PaymentMethod;
+  type: string; // income | expense
   amount: number;
   description: string;
   date: string;
@@ -57,6 +59,7 @@ const Edit = ({ ...props }: EditProps) => {
       date: new Date(props.date),
       amount: formatNumber(props.amount.toString()),
       category_name: props.category.name,
+      payment_method_name: props.payment_method?.name,
       description: props.description,
     },
   });
@@ -67,6 +70,7 @@ const Edit = ({ ...props }: EditProps) => {
     const payload = {
       amount: cleanedAmount(values.amount),
       category_name: values.category_name,
+      payment_method_name: values.payment_method_name,
       description: values.description,
       date: values.date,
     };
@@ -199,6 +203,26 @@ const Edit = ({ ...props }: EditProps) => {
                     <FormControl>
                       <Input
                         placeholder="Category Name"
+                        {...field}
+                        autoComplete="additional-name"
+                        className={`rounded-sm focus-visible:ring-0 ${
+                          form.formState.errors?.category_name &&
+                          "focus-visible:ring-destructive border-destructive"
+                        }`}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="payment_method_name"
+                render={({ field }) => (
+                  <FormItem className="h-[4.4rem] space-y-1">
+                    <FormControl>
+                      <Input
+                        placeholder="ex: Cash, Mobile Banking, etc."
                         {...field}
                         autoComplete="additional-name"
                         className={`rounded-sm focus-visible:ring-0 ${

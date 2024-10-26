@@ -1,4 +1,4 @@
 .scrollArea {
   @apply w-full border-t;
-  height: calc(100vh - 4.6rem - 108px);
+  height: calc(100vh - 4.6rem - 136px);
 }

@@ -4,11 +4,13 @@ import { ICategory } from "@/types";
 import React from "react";
 import Edit from "./edit";
 import Delete from "./delete";
+import { PaymentMethod } from "@/types/payment-methods";
 
 interface TransactionCardProps {
   uuid: string;
   category: ICategory;
-  type: "income" | "expense";
+  payment_method: PaymentMethod;
+  type: string; // income | expense
   amount: number;
   description: string;
   date: string;

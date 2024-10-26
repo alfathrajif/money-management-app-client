@@ -1,9 +1,9 @@
 "use server";
-import { AUTHENTICATION_COOKIE } from "@/app/(auth)/auth-cookie";
 import authServices from "@/services/auth";
 import { IAuthLogin } from "@/types";
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
+import { AUTH_COOKIE_NAME } from "@/constants";
 
 export async function login(payload: IAuthLogin) {
   try {
@@ -39,7 +39,7 @@ const setAuthCookie = (response: Response) => {
   if (setCookieHeader) {
     const token = setCookieHeader.split(";")[0].split("=")[1];
 
-    cookies().set(AUTHENTICATION_COOKIE, token, {
+    cookies().set(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       secure: true,
       expires: new Date(jwtDecode(token).exp! * 1000),

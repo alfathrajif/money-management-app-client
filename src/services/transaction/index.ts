@@ -1,19 +1,5 @@
 import instance from "@/lib/axios/instance";
-
-interface CreateTransaction {
-  category_name: string;
-  type: "income" | "expense";
-  amount: number;
-  description: string;
-  date: Date;
-}
-
-interface UpdateTransaction {
-  category_name: string;
-  amount: number;
-  description: string;
-  date: Date;
-}
+import { CreateTransaction, UpdateTransaction } from "@/types/transaction";
 
 const transactionServices = {
   getTransactions: () =>

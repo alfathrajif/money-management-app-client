@@ -53,6 +53,7 @@ const Create = () => {
       date: new Date(),
       amount: "0",
       category_name: "",
+      payment_method_name: "",
       description: "",
     },
   });
@@ -64,6 +65,7 @@ const Create = () => {
       type: type,
       amount: cleanedAmount(values.amount),
       category_name: values.category_name,
+      payment_method_name: values.payment_method_name,
       description: values.description,
       date: values.date,
     });
@@ -114,7 +116,10 @@ const Create = () => {
       "Groceries",
     ];
 
+    const paymentMethods = ["Cash", "Mobile Banking", "Credit Card"];
+
     let category_name = faker.helpers.arrayElement(categoriesIncome);
+    const payment_method_name = faker.helpers.arrayElement(paymentMethods);
 
     switch (type) {
       case "income":
@@ -130,6 +135,7 @@ const Create = () => {
     form.setValue("date", date);
     form.setValue("amount", formatNumber(amount.toString()));
     form.setValue("category_name", category_name);
+    form.setValue("payment_method_name", payment_method_name);
     form.setValue("description", faker.lorem.sentences({ min: 1, max: 2 }));
   };
 
@@ -151,12 +157,14 @@ const Create = () => {
         <div className="p-8">
           <SelectedType type={type} setType={setType} />
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="grid grid-cols-2 gap-x-5">
               <FormField
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem className="h-[4.4rem] space-y-1">
+                  <FormItem className="h-[4.4rem] space-y-1 col-span-2">
                     <FormControl>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -203,7 +211,7 @@ const Create = () => {
                   };
 
                   return (
-                    <FormItem className="h-[4.4rem] space-y-1">
+                    <FormItem className="h-[4.4rem] space-y-1 col-span-2">
                       <div className="relative">
                         <div className="absolute text-muted-foreground left-4 pb-0.5 top-1/2 -translate-y-1/2">
                           Rp
@@ -237,7 +245,27 @@ const Create = () => {
                   <FormItem className="h-[4.4rem] space-y-1">
                     <FormControl>
                       <Input
-                        placeholder="Category Name"
+                        placeholder="ex: Salary, Freelance Work, etc."
+                        {...field}
+                        autoComplete="additional-name"
+                        className={`rounded-sm focus-visible:ring-0 ${
+                          form.formState.errors?.category_name &&
+                          "focus-visible:ring-destructive border-destructive"
+                        }`}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="payment_method_name"
+                render={({ field }) => (
+                  <FormItem className="h-[4.4rem] space-y-1">
+                    <FormControl>
+                      <Input
+                        placeholder="ex: Cash, Mobile Banking, etc."
                         {...field}
                         autoComplete="additional-name"
                         className={`rounded-sm focus-visible:ring-0 ${
@@ -254,11 +282,11 @@ const Create = () => {
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItem className="min-h-[5.5rem] space-y-1">
+                  <FormItem className="min-h-[5.5rem] space-y-1 col-span-2">
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Type your description here."
+                        placeholder="Enter the description."
                         className={`resize-none rounded-sm focus-visible:ring-0 ${
                           form.formState.errors?.description &&
                           "focus-visible:ring-destructive border-destructive"
@@ -269,7 +297,7 @@ const Create = () => {
                   </FormItem>
                 )}
               />
-              <div className="flex gap-x-1">
+              <div className="flex gap-x-1 col-span-2">
                 <Button
                   type="submit"
                   className="w-full rounded-sm"

@@ -1,12 +1,12 @@
 import React from "react";
 import TransactionCard from "@/components/partials/transaction/transaction-card";
 import Wrapper from "@/components/wrapper";
-import { ITransaction } from "@/types";
+import { Transaction } from "@/types/transaction";
 
 const TransactionCards = ({
   transactions,
 }: {
-  transactions: ITransaction[];
+  transactions: Transaction[];
 }) => {
   return (
     <>
@@ -15,7 +15,7 @@ const TransactionCards = ({
           No transactions yet...
         </div>
       ) : (
-        <Wrapper className="p-4 2xl:p-6 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 2xl:gap-6">
+        <Wrapper className="p-5 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
           {transactions.map((transaction) => (
             <TransactionCard key={transaction.uuid} {...transaction} />
           ))}
