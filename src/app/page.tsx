@@ -32,10 +32,8 @@ export default async function Home() {
             <Wrapper className="flex items-center p-5 pt-0">
               {dataTransaction.sum_payment_methods.map(
                 (paymentMethod, index) => (
-                  <>
-                    <div
-                      key={index}
-                      className="flex text-sm items-center gap-x-2">
+                  <div key={index} className="flex">
+                    <div className="flex text-sm items-center gap-x-2">
                       <div className="capitalize ">{paymentMethod.name}</div>
                       <div className="text-muted-foreground">
                         {formatCurrency(paymentMethod.total, "IDR", "id-ID")}
@@ -48,7 +46,7 @@ export default async function Home() {
                         className="h-4 mx-3 border border-foreground"
                       />
                     )}
-                  </>
+                  </div>
                 )
               )}
             </Wrapper>
