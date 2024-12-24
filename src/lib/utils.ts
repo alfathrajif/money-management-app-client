@@ -20,8 +20,7 @@ export function formatNumber(value: string) {
   // Remove any non-numeric characters
   const numericValue = value.replace(/\D/g, "");
 
-  // Format the number with dots after every 3 digits
-  return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return numericValue.replace(/(\d{3})(?=\d)/g, "$1.");
 }
 
 export function cleanedAmount(amount: string) {
